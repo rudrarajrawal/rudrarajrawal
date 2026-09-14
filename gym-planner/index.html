@@ -19,6 +19,7 @@
       <button class="nav-btn active" data-view="dashboard">Dashboard</button>
       <button class="nav-btn" data-view="workouts">Workouts</button>
       <button class="nav-btn" data-view="meals">Meals</button>
+      <button class="nav-btn" data-view="compete">Compete</button>
       <button class="nav-btn" data-view="health">Apple Health</button>
       <button class="nav-btn" data-view="progress">Progress</button>
       <button class="nav-btn" data-view="settings">Settings</button>
@@ -147,6 +148,17 @@
       <div class="meal-grid" id="meal-grid"></div>
     </section>
 
+    <!-- COMPETE -->
+    <section id="view-compete" class="view">
+      <header class="view-header">
+        <div>
+          <h1>Compete</h1>
+          <p class="subtitle">A shared leaderboard for you and your gym friends</p>
+        </div>
+      </header>
+      <div id="compete-root"></div>
+    </section>
+
     <!-- APPLE HEALTH -->
     <section id="view-health" class="view">
       <header class="view-header">
@@ -237,6 +249,8 @@
 <script src="workouts.js"></script>
 <script src="meals.js"></script>
 <script src="health-import.js"></script>
+<script src="supabase-client.js"></script>
+<script src="compete.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

@@ -308,6 +308,34 @@ body {
   .macro-row { grid-template-columns: repeat(2, 1fr); }
 }
 
+/* ---------- Compete ---------- */
+.join-row { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+.join-row input {
+  flex: 1;
+  min-width: 180px;
+  background: var(--surface-2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 14px;
+}
+.exercise-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+.exercise-form input {
+  background: var(--surface-2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 13px;
+}
+.exercise-form button { grid-column: 1 / -1; }
+
 /* ---------- Health import ---------- */
 .steps-list { color: var(--text-dim); font-size: 14px; line-height: 1.7; }
 .note { color: var(--text-dim); font-size: 12.5px; background: var(--surface-2); border-radius: 10px; padding: 10px 12px; }

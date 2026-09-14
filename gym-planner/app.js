@@ -29,6 +29,7 @@ function initNav() {
       btn.classList.add("active");
       document.querySelectorAll(".view").forEach((v) => v.classList.remove("active"));
       document.getElementById("view-" + btn.dataset.view).classList.add("active");
+      if (btn.dataset.view === "compete") renderCompeteView();
     });
   });
 }
@@ -210,6 +211,7 @@ function logWorkout(workout, completedCount) {
   });
   saveJSON(STORAGE_KEYS.log, log);
   updateStreak(log);
+  logPresetWorkoutToCompete(workout, completedCount);
 }
 
 function updateStreak(log) {
@@ -419,6 +421,7 @@ function renderMealGrid() {
       renderMealLog();
       renderCalorieSummary();
       renderDashboardStats();
+      checkAndAwardCalorieBonus();
     });
   });
 }
