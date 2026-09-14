@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gym Home Planner</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="app">
+
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="brand-mark">💪</span>
+      <span class="brand-name">Gym Planner</span>
+    </div>
+    <nav class="nav">
+      <button class="nav-btn active" data-view="dashboard">Dashboard</button>
+      <button class="nav-btn" data-view="workouts">Workouts</button>
+      <button class="nav-btn" data-view="health">Apple Health</button>
+      <button class="nav-btn" data-view="progress">Progress</button>
+      <button class="nav-btn" data-view="settings">Settings</button>
+    </nav>
+    <div class="sidebar-footer">
+      <span id="streak-badge">🔥 0 day streak</span>
+    </div>
+  </aside>
+
+  <main class="content">
+
+    <!-- DASHBOARD -->
+    <section id="view-dashboard" class="view active">
+      <header class="view-header">
+        <div>
+          <h1>Dashboard</h1>
+          <p class="subtitle" id="today-label">Today</p>
+        </div>
+      </header>
+
+      <div class="dashboard-grid">
+
+        <div class="card clock-card">
+          <div class="clock-time" id="clock-time">00:00:00</div>
+          <div class="clock-date" id="clock-date">Loading date…</div>
+          <div class="clock-tz" id="clock-tz"></div>
+        </div>
+
+        <div class="card stat-card">
+          <div class="stat-label">Steps Today</div>
+          <div class="stat-value" id="stat-steps">—</div>
+          <div class="stat-hint">from Apple Health import</div>
+        </div>
+
+        <div class="card stat-card">
+          <div class="stat-label">Active Energy</div>
+          <div class="stat-value" id="stat-energy">—</div>
+          <div class="stat-hint">kcal, from Apple Health import</div>
+        </div>
+
+        <div class="card stat-card">
+          <div class="stat-label">Workouts Logged</div>
+          <div class="stat-value" id="stat-workouts">0</div>
+          <div class="stat-hint">all time, in-app log</div>
+        </div>
+
+        <div class="card wide-card" id="today-plan-card">
+          <div class="card-head">
+            <h2>Today's Plan</h2>
+            <button class="btn btn-ghost" id="shuffle-plan">Shuffle</button>
+          </div>
+          <div id="today-plan-body">Loading…</div>
+        </div>
+
+        <div class="card wide-card" id="rest-timer-card">
+          <div class="card-head">
+            <h2>Rest Timer</h2>
+          </div>
+          <div class="timer-row">
+            <div class="timer-display" id="timer-display">00:60</div>
+            <div class="timer-controls">
+              <button class="btn" data-seconds="30">30s</button>
+              <button class="btn" data-seconds="60">60s</button>
+              <button class="btn" data-seconds="90">90s</button>
+              <button class="btn btn-primary" id="timer-start">Start</button>
+              <button class="btn btn-ghost" id="timer-reset">Reset</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- WORKOUTS -->
+    <section id="view-workouts" class="view">
+      <header class="view-header">
+        <div>
+          <h1>Workouts</h1>
+          <p class="subtitle">Pick a program and follow the guided moves</p>
+        </div>
+      </header>
+      <div class="workout-tabs" id="workout-tabs"></div>
+      <div id="workout-detail"></div>
+    </section>
+
+    <!-- APPLE HEALTH -->
+    <section id="view-health" class="view">
+      <header class="view-header">
+        <div>
+          <h1>Apple Health</h1>
+          <p class="subtitle">Import your Health app export — everything is parsed locally in your browser, nothing is uploaded anywhere</p>
+        </div>
+      </header>
+
+      <div class="card">
+        <h2>How to export from iPhone</h2>
+        <ol class="steps-list">
+          <li>Open the <strong>Health</strong> app on your iPhone</li>
+          <li>Tap your profile picture (top right) → <strong>Export All Health Data</strong></li>
+          <li>Share/save the resulting <code>export.zip</code> file to your Mac/PC or a cloud drive</li>
+          <li>Drop that <code>.zip</code> file below</li>
+        </ol>
+        <p class="note">Apple does not provide a live web API for HealthKit — connecting a website directly to Health in real time isn't possible on any platform. This import reads your official export file entirely in-browser (via JSZip), so your data never leaves this device.</p>
+
+        <div class="dropzone" id="health-dropzone">
+          <input type="file" id="health-file-input" accept=".zip" hidden>
+          <p>Drag & drop <code>export.zip</code> here, or <button class="link-btn" id="health-browse-btn">browse</button></p>
+          <p class="dropzone-status" id="health-status"></p>
+        </div>
+      </div>
+
+      <div class="card" id="health-results" hidden>
+        <h2>Imported Summary</h2>
+        <div class="health-summary-grid" id="health-summary-grid"></div>
+        <h3>Recent Workouts</h3>
+        <table class="health-table" id="health-workouts-table">
+          <thead><tr><th>Type</th><th>Date</th><th>Duration</th><th>Energy</th><th>Distance</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- PROGRESS -->
+    <section id="view-progress" class="view">
+      <header class="view-header">
+        <div>
+          <h1>Progress</h1>
+          <p class="subtitle">Your logged workout history</p>
+        </div>
+      </header>
+      <div class="card">
+        <table class="health-table" id="log-table">
+          <thead><tr><th>Date</th><th>Program</th><th>Exercises Completed</th></tr></thead>
+          <tbody></tbody>
+        </table>
+        <p id="log-empty" class="note">No workouts logged yet — finish a program on the Workouts tab to see it here.</p>
+      </div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section id="view-settings" class="view">
+      <header class="view-header">
+        <div>
+          <h1>Settings</h1>
+        </div>
+      </header>
+      <div class="card">
+        <div class="setting-row">
+          <label for="theme-select">Theme</label>
+          <select id="theme-select">
+            <option value="dark">Dark</option>
+            <option value="light">Light</option>
+          </select>
+        </div>
+        <div class="setting-row">
+          <label for="units-select">Units</label>
+          <select id="units-select">
+            <option value="metric">Metric (kg / km)</option>
+            <option value="imperial">Imperial (lb / mi)</option>
+          </select>
+        </div>
+        <div class="setting-row">
+          <label>Reset local data</label>
+          <button class="btn btn-danger" id="reset-data-btn">Clear workout log & health import</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="workouts.js"></script>
+<script src="health-import.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
