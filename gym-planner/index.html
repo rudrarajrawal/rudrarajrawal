@@ -18,6 +18,7 @@
     <nav class="nav">
       <button class="nav-btn active" data-view="dashboard">Dashboard</button>
       <button class="nav-btn" data-view="workouts">Workouts</button>
+      <button class="nav-btn" data-view="meals">Meals</button>
       <button class="nav-btn" data-view="health">Apple Health</button>
       <button class="nav-btn" data-view="progress">Progress</button>
       <button class="nav-btn" data-view="settings">Settings</button>
@@ -64,6 +65,12 @@
           <div class="stat-hint">all time, in-app log</div>
         </div>
 
+        <div class="card stat-card">
+          <div class="stat-label">Calories Today</div>
+          <div class="stat-value" id="stat-calories">0</div>
+          <div class="stat-hint" id="stat-calories-hint">of 2200 kcal target</div>
+        </div>
+
         <div class="card wide-card" id="today-plan-card">
           <div class="card-head">
             <h2>Today's Plan</h2>
@@ -101,6 +108,43 @@
       </header>
       <div class="workout-tabs" id="workout-tabs"></div>
       <div id="workout-detail"></div>
+    </section>
+
+    <!-- MEALS -->
+    <section id="view-meals" class="view">
+      <header class="view-header">
+        <div>
+          <h1>Meals</h1>
+          <p class="subtitle">Pure vegetarian meal log — no egg, no meat, no fish</p>
+        </div>
+      </header>
+
+      <div class="card wide-card">
+        <div class="card-head">
+          <h2>Today's Calories</h2>
+          <div class="target-input-row">
+            <label for="calorie-target-input">Daily target</label>
+            <input type="number" id="calorie-target-input" min="1000" max="6000" step="50">
+            <span>kcal</span>
+          </div>
+        </div>
+        <div class="calorie-progress">
+          <div class="calorie-progress-bar" id="calorie-progress-bar"></div>
+        </div>
+        <div class="macro-row" id="macro-row"></div>
+      </div>
+
+      <div class="card">
+        <h2>Today's Log</h2>
+        <table class="health-table" id="meal-log-table">
+          <thead><tr><th>Meal</th><th>Servings</th><th>kcal</th><th>Protein</th><th></th></tr></thead>
+          <tbody></tbody>
+        </table>
+        <p id="meal-log-empty" class="note">No meals logged yet today — add one from the list below.</p>
+      </div>
+
+      <div class="workout-tabs" id="meal-category-tabs"></div>
+      <div class="meal-grid" id="meal-grid"></div>
     </section>
 
     <!-- APPLE HEALTH -->
@@ -191,6 +235,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="workouts.js"></script>
+<script src="meals.js"></script>
 <script src="health-import.js"></script>
 <script src="app.js"></script>
 </body>

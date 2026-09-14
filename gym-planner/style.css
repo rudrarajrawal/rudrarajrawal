@@ -251,6 +251,63 @@ body {
 
 .move-cardio .figure { animation: cardio-jump 0.6s ease-in-out infinite; }
 
+/* ---------- Meals & calorie counter ---------- */
+.target-input-row { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-dim); }
+.target-input-row input {
+  width: 80px;
+  background: var(--surface-2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px 8px;
+}
+.calorie-progress {
+  height: 12px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  overflow: hidden;
+  margin-bottom: 14px;
+}
+.calorie-progress-bar {
+  height: 100%;
+  width: 0%;
+  background: var(--accent-2);
+  transition: width 0.3s ease;
+}
+.calorie-progress-bar.over-target { background: var(--danger); }
+.macro-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+
+.meal-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
+}
+.meal-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.meal-card-head { display: flex; justify-content: space-between; align-items: center; gap: 6px; }
+.meal-name { font-weight: 600; font-size: 14px; }
+.meal-macros { color: var(--text-dim); font-size: 12px; }
+.meal-card-foot { display: flex; gap: 8px; align-items: center; }
+.servings-select {
+  background: var(--surface-2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px 8px;
+  font-size: 12px;
+}
+
+@media (max-width: 560px) {
+  .macro-row { grid-template-columns: repeat(2, 1fr); }
+}
+
 /* ---------- Health import ---------- */
 .steps-list { color: var(--text-dim); font-size: 14px; line-height: 1.7; }
 .note { color: var(--text-dim); font-size: 12.5px; background: var(--surface-2); border-radius: 10px; padding: 10px 12px; }

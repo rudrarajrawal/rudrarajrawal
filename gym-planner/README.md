@@ -1,6 +1,6 @@
 # Gym Home Planner
 
-A single-page, no-build web app: a home gym dashboard with a live clock, multiple guided workout programs, a rest timer, workout logging with a streak counter, and Apple Health data import.
+A single-page, no-build web app: a home gym dashboard with a live clock, multiple guided workout programs, a rest timer, workout logging with a streak counter, a pure-vegetarian meal & calorie counter, and Apple Health data import.
 
 ## Run it
 
@@ -11,6 +11,7 @@ No build step needed — just open `index.html` in a browser, or serve the folde
 - **Dashboard** — live digital clock, today's date, a rotating "today's plan" workout, a rest timer, and quick stats (steps / active energy from an Apple Health import, workouts logged, streak).
 - **Workouts** — six built-in programs (Push, Pull, Legs, Full Body Beginner, HIIT Cardio, Core & Abs) in `workouts.js`. Each exercise has sets/reps/rest and a check-off list; finishing a session logs it to your Progress tab (saved in `localStorage`).
 - **Progress** — history table of logged workouts and a day streak counter.
+- **Meals** — a pure-vegetarian meal database (no egg, no meat, no fish) in `meals.js`, organized into Breakfast / Lunch-Dinner / Snacks, each with kcal/protein/carbs/fat per serving and a "High Protein" tag (≥12g protein) for gym goals. Log a meal at 0.5x–2x servings to track it against a daily calorie target (editable, saved in `localStorage`); the dashboard shows calories consumed vs. target.
 - **Apple Health import** — see below.
 - **Settings** — dark/light theme, unit preference, and a data-reset button.
 
@@ -38,6 +39,7 @@ gym-planner/
 ├── index.html        # markup for all views
 ├── style.css          # theme, layout, move-guide animations
 ├── workouts.js         # workout/exercise data
+├── meals.js             # pure-veg meal database (kcal/protein/carbs/fat)
 ├── health-import.js    # Apple Health export.zip parsing
 ├── app.js              # clock, nav, timer, workout logging, wiring
 └── README.md

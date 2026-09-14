@@ -4,7 +4,8 @@ const STORAGE_KEYS = {
   log: "gymplanner.log",
   health: "gymplanner.health",
   settings: "gymplanner.settings",
-  todayPlan: "gymplanner.todayPlan"
+  todayPlan: "gymplanner.todayPlan",
+  mealLog: "gymplanner.mealLog"
 };
 
 function loadJSON(key, fallback) {
@@ -268,6 +269,11 @@ function renderDashboardStats() {
   document.getElementById("stat-steps").textContent = health ? health.stepsToday.toLocaleString() : "—";
   document.getElementById("stat-energy").textContent = health ? `${health.energyToday}` : "—";
 
+  const mealTotals = sumMacros(getTodayMealEntries());
+  const target = getCalorieTarget();
+  document.getElementById("stat-calories").textContent = mealTotals.kcal;
+  document.getElementById("stat-calories-hint").textContent = `of ${target} kcal target`;
+
   updateStreak(log);
 }
 
@@ -284,6 +290,184 @@ function renderProgress() {
     </tr>
   `).join("");
   empty.hidden = log.length > 0;
+}
+
+/* ---------- Meals & calorie counter ---------- */
+const DEFAULT_CALORIE_TARGET = 2200;
+let activeMealCategory = MEAL_CATEGORIES[0];
+
+function todayKey() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function getMealLogAll() {
+  return loadJSON(STORAGE_KEYS.mealLog, {});
+}
+
+function getTodayMealEntries() {
+  const all = getMealLogAll();
+  return (all[todayKey()] && all[todayKey()].entries) || [];
+}
+
+function getCalorieTarget() {
+  const settings = loadJSON(STORAGE_KEYS.settings, {});
+  return settings.calorieTarget || DEFAULT_CALORIE_TARGET;
+}
+
+function setCalorieTarget(value) {
+  const settings = loadJSON(STORAGE_KEYS.settings, { theme: "dark", units: "metric" });
+  settings.calorieTarget = value;
+  saveJSON(STORAGE_KEYS.settings, settings);
+}
+
+function addMealEntry(meal, servings) {
+  const all = getMealLogAll();
+  const key = todayKey();
+  if (!all[key]) all[key] = { entries: [] };
+  all[key].entries.push({
+    mealId: meal.id,
+    name: meal.name,
+    servings,
+    kcal: Math.round(meal.kcal * servings),
+    protein: Math.round(meal.protein * servings),
+    carbs: Math.round(meal.carbs * servings),
+    fat: Math.round(meal.fat * servings),
+    loggedAt: new Date().toISOString()
+  });
+  saveJSON(STORAGE_KEYS.mealLog, all);
+}
+
+function removeMealEntry(index) {
+  const all = getMealLogAll();
+  const key = todayKey();
+  if (!all[key]) return;
+  all[key].entries.splice(index, 1);
+  saveJSON(STORAGE_KEYS.mealLog, all);
+}
+
+function sumMacros(entries) {
+  return entries.reduce((acc, e) => {
+    acc.kcal += e.kcal;
+    acc.protein += e.protein;
+    acc.carbs += e.carbs;
+    acc.fat += e.fat;
+    return acc;
+  }, { kcal: 0, protein: 0, carbs: 0, fat: 0 });
+}
+
+function initMealsView() {
+  const tabsEl = document.getElementById("meal-category-tabs");
+  tabsEl.innerHTML = MEAL_CATEGORIES.map((c) =>
+    `<button class="tab-btn" data-cat="${c}">${c}</button>`
+  ).join("");
+  tabsEl.querySelectorAll(".tab-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      activeMealCategory = btn.dataset.cat;
+      renderMealGrid();
+    });
+  });
+
+  const targetInput = document.getElementById("calorie-target-input");
+  targetInput.value = getCalorieTarget();
+  targetInput.addEventListener("change", () => {
+    const value = Math.max(1000, Math.min(6000, parseInt(targetInput.value, 10) || DEFAULT_CALORIE_TARGET));
+    setCalorieTarget(value);
+    targetInput.value = value;
+    renderCalorieSummary();
+    renderDashboardStats();
+  });
+
+  renderMealGrid();
+  renderMealLog();
+  renderCalorieSummary();
+}
+
+function renderMealGrid() {
+  const tabsEl = document.getElementById("meal-category-tabs");
+  tabsEl.querySelectorAll(".tab-btn").forEach((b) =>
+    b.classList.toggle("active", b.dataset.cat === activeMealCategory)
+  );
+
+  const grid = document.getElementById("meal-grid");
+  const meals = MEALS.filter((m) => m.category === activeMealCategory);
+  grid.innerHTML = meals.map((m) => `
+    <div class="meal-card">
+      <div class="meal-card-head">
+        <span class="meal-name">${m.name}</span>
+        ${isHighProtein(m) ? '<span class="pill">High Protein</span>' : ""}
+      </div>
+      <div class="meal-macros">${m.kcal} kcal &middot; P ${m.protein}g &middot; C ${m.carbs}g &middot; F ${m.fat}g</div>
+      <div class="meal-card-foot">
+        <select class="servings-select" data-meal="${m.id}">
+          <option value="0.5">0.5x</option>
+          <option value="1" selected>1x</option>
+          <option value="1.5">1.5x</option>
+          <option value="2">2x</option>
+        </select>
+        <button class="btn btn-primary" data-log-meal="${m.id}">Add</button>
+      </div>
+    </div>
+  `).join("");
+
+  grid.querySelectorAll("[data-log-meal]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const mealId = btn.dataset.logMeal;
+      const meal = MEALS.find((m) => m.id === mealId);
+      const select = grid.querySelector(`.servings-select[data-meal="${mealId}"]`);
+      const servings = parseFloat(select.value);
+      addMealEntry(meal, servings);
+      renderMealLog();
+      renderCalorieSummary();
+      renderDashboardStats();
+    });
+  });
+}
+
+function renderMealLog() {
+  const entries = getTodayMealEntries();
+  const tbody = document.querySelector("#meal-log-table tbody");
+  const empty = document.getElementById("meal-log-empty");
+  tbody.innerHTML = entries.map((e, i) => `
+    <tr>
+      <td>${e.name}</td>
+      <td>${e.servings}x</td>
+      <td>${e.kcal}</td>
+      <td>${e.protein}g</td>
+      <td><button class="link-btn" data-remove-entry="${i}">Remove</button></td>
+    </tr>
+  `).join("");
+  empty.hidden = entries.length > 0;
+
+  tbody.querySelectorAll("[data-remove-entry]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      removeMealEntry(parseInt(btn.dataset.removeEntry, 10));
+      renderMealLog();
+      renderCalorieSummary();
+      renderDashboardStats();
+    });
+  });
+}
+
+function renderCalorieSummary() {
+  const entries = getTodayMealEntries();
+  const totals = sumMacros(entries);
+  const target = getCalorieTarget();
+  const pct = Math.min(100, Math.round((totals.kcal / target) * 100));
+
+  const bar = document.getElementById("calorie-progress-bar");
+  if (bar) {
+    bar.style.width = pct + "%";
+    bar.classList.toggle("over-target", totals.kcal > target);
+  }
+  const macroRow = document.getElementById("macro-row");
+  if (macroRow) {
+    macroRow.innerHTML = `
+      <div class="mini-stat"><div class="mini-stat-label">Calories</div><div class="mini-stat-value">${totals.kcal} / ${target}</div></div>
+      <div class="mini-stat"><div class="mini-stat-label">Protein</div><div class="mini-stat-value">${totals.protein}g</div></div>
+      <div class="mini-stat"><div class="mini-stat-label">Carbs</div><div class="mini-stat-value">${totals.carbs}g</div></div>
+      <div class="mini-stat"><div class="mini-stat-label">Fat</div><div class="mini-stat-value">${totals.fat}g</div></div>
+    `;
+  }
 }
 
 /* ---------- Apple Health import wiring ---------- */
@@ -373,11 +557,14 @@ function initSettings() {
     localStorage.removeItem(STORAGE_KEYS.log);
     localStorage.removeItem(STORAGE_KEYS.health);
     localStorage.removeItem(STORAGE_KEYS.todayPlan);
+    localStorage.removeItem(STORAGE_KEYS.mealLog);
     document.getElementById("health-results").hidden = true;
     document.getElementById("health-status").textContent = "";
     renderDashboardStats();
     renderProgress();
     renderTodayPlan();
+    renderMealLog();
+    renderCalorieSummary();
   });
 }
 
@@ -387,6 +574,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initClock();
   initRestTimer();
   initWorkoutsView();
+  initMealsView();
   initHealthImport();
   initSettings();
   renderTodayPlan();
