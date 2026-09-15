@@ -68,6 +68,23 @@ async function logPresetWorkoutToCompete(workout, completedCount) {
   }
 }
 
+async function logQuickEntryToCompete(text) {
+  const player = getCompetePlayer();
+  if (!player) return;
+  try {
+    await Supabase.insert("gym_activity_logs", {
+      player_id: player.id,
+      log_date: competeTodayDate(),
+      kind: "quick_log",
+      title: text.slice(0, 80),
+      details: { text },
+      points: 3
+    });
+  } catch (e) {
+    console.error("Failed to sync quick log to leaderboard:", e);
+  }
+}
+
 async function logCustomExercise({ name, sets, reps, weight, notes }) {
   const player = getCompetePlayer();
   if (!player) throw new Error("Join the competition first.");
@@ -143,6 +160,7 @@ async function fetchLeaderboard() {
     points: 0,
     workouts: 0,
     customExercises: 0,
+    quickLogs: 0,
     activeDates: new Set()
   }]));
 
@@ -153,6 +171,7 @@ async function fetchLeaderboard() {
     row.activeDates.add(log.log_date);
     if (log.kind === "preset_workout") row.workouts += 1;
     if (log.kind === "custom_exercise") row.customExercises += 1;
+    if (log.kind === "quick_log") row.quickLogs += 1;
   });
 
   return Array.from(byPlayer.values())
@@ -162,6 +181,7 @@ async function fetchLeaderboard() {
         name: row.name,
         workouts: row.workouts,
         customExercises: row.customExercises,
+        quickLogs: row.quickLogs,
         basePoints: row.points,
         streak,
         totalPoints: row.points + Math.min(streak, 14) * 2
@@ -207,7 +227,7 @@ function renderCompeteView() {
         <h2>Competing as ${player.name}</h2>
         <button class="btn btn-ghost" id="leave-compete-btn">Switch player</button>
       </div>
-      <p class="note">+10 pts per finished workout &middot; +5 pts per custom exercise logged &middot; +5 pts for hitting your daily calorie target &middot; up to +28 pts streak bonus. Resets each month.</p>
+      <p class="note">+10 pts per finished workout &middot; +5 pts per custom exercise logged &middot; +5 pts for hitting your daily calorie target &middot; +3 pts per Quick Log entry &middot; up to +28 pts streak bonus. Resets each month.</p>
     </div>
 
     <div class="card">
@@ -230,7 +250,7 @@ function renderCompeteView() {
         <button class="btn btn-ghost" id="refresh-leaderboard-btn">Refresh</button>
       </div>
       <table class="health-table" id="leaderboard-table">
-        <thead><tr><th>#</th><th>Name</th><th>Points</th><th>Streak</th><th>Workouts</th><th>Custom Exercises</th></tr></thead>
+        <thead><tr><th>#</th><th>Name</th><th>Points</th><th>Streak</th><th>Workouts</th><th>Custom Exercises</th><th>Quick Logs</th></tr></thead>
         <tbody></tbody>
       </table>
       <p id="leaderboard-status" class="note"></p>
@@ -286,8 +306,9 @@ async function loadLeaderboard() {
         <td>${r.streak > 0 ? "🔥 " + r.streak : "—"}</td>
         <td>${r.workouts}</td>
         <td>${r.customExercises}</td>
+        <td>${r.quickLogs}</td>
       </tr>
-    `).join("") || `<tr><td colspan="6">No one has logged anything yet this month.</td></tr>`;
+    `).join("") || `<tr><td colspan="7">No one has logged anything yet this month.</td></tr>`;
     statusEl.textContent = "";
   } catch (e) {
     statusEl.textContent = "Couldn't load leaderboard: " + e.message;

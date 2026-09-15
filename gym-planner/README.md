@@ -8,7 +8,7 @@ No build step needed — just open `index.html` in a browser, or serve the folde
 
 ## Features
 
-- **Dashboard** — live digital clock, today's date, a rotating "today's plan" workout, a rest timer, and quick stats (steps / active energy from an Apple Health import, workouts logged, streak).
+- **Dashboard** — live digital clock, today's date, a **Quick Log** free-text box (type what you did, no forms), a rotating "today's plan" workout, a rest timer, and quick stats (steps / active energy from an Apple Health import, workouts logged, streak).
 - **Workouts** — six built-in programs (Push, Pull, Legs, Full Body Beginner, HIIT Cardio, Core & Abs) in `workouts.js`. Each exercise has sets/reps/rest and a check-off list; finishing a session logs it to your Progress tab (saved in `localStorage`).
 - **Progress** — history table of logged workouts and a day streak counter.
 - **Meals** — a pure-vegetarian meal database (no egg, no meat, no fish) in `meals.js`, organized into Breakfast / Lunch-Dinner / Snacks, each with kcal/protein/carbs/fat per serving and a "High Protein" tag (≥12g protein) for gym goals. Log a meal at 0.5x–2x servings to track it against a daily calorie target (editable, saved in `localStorage`); the dashboard shows calories consumed vs. target.
@@ -38,8 +38,8 @@ A Claude Artifact's built-in shared database was considered instead, but it's re
 How it works:
 1. Each person opens the same deployed copy of this site and picks a name on the **Compete** tab — that's their identity, stored in `localStorage` on their device (no login).
 2. Finishing a preset workout, logging a custom exercise, or hitting your daily calorie target all sync points to the shared `gym_activity_logs` table.
-3. Scoring (resets every calendar month): **+10** per finished workout, **+5** per custom exercise logged, **+5** once per day for landing within 85–110% of your calorie target, plus a live streak bonus of **+2/day** (capped at 14 days) for consecutive active days.
-4. The **Add Exercise** form is for anything not in the six preset programs — name, sets, reps, weight, and notes, logged with full detail and worth points just like a preset workout.
+3. Scoring (resets every calendar month): **+10** per finished workout, **+5** per custom exercise logged, **+5** once per day for landing within 85–110% of your calorie target, **+3** per Quick Log entry, plus a live streak bonus of **+2/day** (capped at 14 days) for consecutive active days.
+4. The **Add Exercise** form (on the Compete tab) is for anything not in the six preset programs — name, sets, reps, weight, and notes, logged with full detail and worth points just like a preset workout. The **Quick Log** box on the dashboard is the fastest path — just type what you did in plain words.
 
 The database's row-level security allows any visitor to read the leaderboard and insert their own log rows (there's no per-user auth) — fine for a small group of friends competing casually, but don't put anything sensitive in it, and note that anyone with the link could technically log entries under any name.
 

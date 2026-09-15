@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Gym Home Planner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -12,17 +15,19 @@
 
   <aside class="sidebar">
     <div class="brand">
-      <span class="brand-mark">💪</span>
+      <span class="brand-mark">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6.5 6.5v11M17.5 6.5v11M2 9v6M22 9v6M6.5 12h11"/></svg>
+      </span>
       <span class="brand-name">Gym Planner</span>
     </div>
     <nav class="nav">
-      <button class="nav-btn active" data-view="dashboard">Dashboard</button>
-      <button class="nav-btn" data-view="workouts">Workouts</button>
-      <button class="nav-btn" data-view="meals">Meals</button>
-      <button class="nav-btn" data-view="compete">Compete</button>
-      <button class="nav-btn" data-view="health">Apple Health</button>
-      <button class="nav-btn" data-view="progress">Progress</button>
-      <button class="nav-btn" data-view="settings">Settings</button>
+      <button class="nav-btn active" data-view="dashboard"><svg class="nav-icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg><span>Dashboard</span></button>
+      <button class="nav-btn" data-view="workouts"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M6.5 6.5v11M17.5 6.5v11M2 9v6M22 9v6M6.5 12h11"/></svg><span>Workouts</span></button>
+      <button class="nav-btn" data-view="meals"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M7 3v7a2 2 0 0 0 2 2v9M7 3v6M9 3v6M11 3v7a2 2 0 0 1-2 2M17 3c-1.5 0-3 1.5-3 4v4h3m0-8v17"/></svg><span>Meals</span></button>
+      <button class="nav-btn" data-view="compete"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 0 1-10 0V4ZM7 5H4v2a3 3 0 0 0 3 3M17 5h3v2a3 3 0 0 1-3 3"/></svg><span>Compete</span></button>
+      <button class="nav-btn" data-view="health"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M12 21s-7.5-4.9-10-9.5C.5 8 2 4.5 5.5 4A5 5 0 0 1 12 7a5 5 0 0 1 6.5-3c3.5.5 5 4 3.5 7.5C19.5 16.1 12 21 12 21Z"/></svg><span>Apple Health</span></button>
+      <button class="nav-btn" data-view="progress"><svg class="nav-icon" viewBox="0 0 24 24"><path d="M3 21V9M10 21V3M17 21v-7"/></svg><span>Progress</span></button>
+      <button class="nav-btn" data-view="settings"><svg class="nav-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg><span>Settings</span></button>
     </nav>
     <div class="sidebar-footer">
       <span id="streak-badge">🔥 0 day streak</span>
@@ -72,6 +77,19 @@
           <div class="stat-hint" id="stat-calories-hint">of 2200 kcal target</div>
         </div>
 
+        <div class="card wide-card" id="quick-log-card">
+          <div class="card-head">
+            <h2>Quick Log</h2>
+            <span class="pill pill-muted">just type it, no forms</span>
+          </div>
+          <p class="subtitle">Did a workout or ate something and don't want to fill out a form? Jot it down here — it still counts toward your streak.</p>
+          <div class="quick-log-row">
+            <input type="text" id="quick-log-input" placeholder="e.g. Chest day at the gym + 2 rotis and dal for dinner" maxlength="140">
+            <button class="btn btn-primary" id="quick-log-btn">Log it</button>
+          </div>
+          <ul class="quick-log-list" id="quick-log-list"></ul>
+        </div>
+
         <div class="card wide-card" id="today-plan-card">
           <div class="card-head">
             <h2>Today's Plan</h2>
@@ -104,7 +122,7 @@
       <header class="view-header">
         <div>
           <h1>Workouts</h1>
-          <p class="subtitle">Pick a program and follow the guided moves</p>
+          <p class="subtitle">Pick a program, check off exercises as you go, then tap <strong>Log this workout</strong> to save it to your Progress tab</p>
         </div>
       </header>
       <div class="workout-tabs" id="workout-tabs"></div>
@@ -116,7 +134,7 @@
       <header class="view-header">
         <div>
           <h1>Meals</h1>
-          <p class="subtitle">Pure vegetarian meal log — no egg, no meat, no fish</p>
+          <p class="subtitle">Pure vegetarian (no egg, no meat, no fish) — tap <strong>Add</strong> on any meal below to log it and track your calories</p>
         </div>
       </header>
 

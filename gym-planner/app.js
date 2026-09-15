@@ -5,7 +5,8 @@ const STORAGE_KEYS = {
   health: "gymplanner.health",
   settings: "gymplanner.settings",
   todayPlan: "gymplanner.todayPlan",
-  mealLog: "gymplanner.mealLog"
+  mealLog: "gymplanner.mealLog",
+  quickLog: "gymplanner.quickLog"
 };
 
 function loadJSON(key, fallback) {
@@ -210,12 +211,19 @@ function logWorkout(workout, completedCount) {
     total: workout.exercises.length
   });
   saveJSON(STORAGE_KEYS.log, log);
-  updateStreak(log);
+  updateStreak();
   logPresetWorkoutToCompete(workout, completedCount);
 }
 
-function updateStreak(log) {
-  const days = new Set(log.map((entry) => entry.date.slice(0, 10)));
+function updateStreak() {
+  const days = new Set();
+  loadJSON(STORAGE_KEYS.log, []).forEach((entry) => days.add(entry.date.slice(0, 10)));
+  loadJSON(STORAGE_KEYS.quickLog, []).forEach((entry) => days.add(entry.timestamp.slice(0, 10)));
+  const mealLogAll = loadJSON(STORAGE_KEYS.mealLog, {});
+  Object.keys(mealLogAll).forEach((date) => {
+    if (mealLogAll[date].entries && mealLogAll[date].entries.length) days.add(date);
+  });
+
   let streak = 0;
   let cursor = new Date();
   while (days.has(cursor.toISOString().slice(0, 10))) {
@@ -262,6 +270,43 @@ function renderTodayPlan() {
   });
 }
 
+/* ---------- Quick Log (free-text) ---------- */
+function initQuickLog() {
+  document.getElementById("quick-log-btn").addEventListener("click", submitQuickLog);
+  document.getElementById("quick-log-input").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") submitQuickLog();
+  });
+  renderQuickLog();
+}
+
+function submitQuickLog() {
+  const input = document.getElementById("quick-log-input");
+  const text = input.value.trim();
+  if (!text) return;
+
+  const log = loadJSON(STORAGE_KEYS.quickLog, []);
+  log.unshift({ text, timestamp: new Date().toISOString() });
+  saveJSON(STORAGE_KEYS.quickLog, log);
+  updateStreak();
+  input.value = "";
+  renderQuickLog();
+  logQuickEntryToCompete(text);
+}
+
+function renderQuickLog() {
+  const list = document.getElementById("quick-log-list");
+  const log = loadJSON(STORAGE_KEYS.quickLog, []);
+  const todayKey = new Date().toISOString().slice(0, 10);
+  const todays = log.filter((entry) => entry.timestamp.slice(0, 10) === todayKey);
+
+  list.innerHTML = todays.map((entry) => `
+    <li>
+      <span class="quick-log-time">${new Date(entry.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>
+      <span class="quick-log-text">${entry.text}</span>
+    </li>
+  `).join("") || `<li class="quick-log-empty">Nothing logged today yet.</li>`;
+}
+
 /* ---------- Dashboard stats ---------- */
 function renderDashboardStats() {
   const log = loadJSON(STORAGE_KEYS.log, []);
@@ -276,7 +321,7 @@ function renderDashboardStats() {
   document.getElementById("stat-calories").textContent = mealTotals.kcal;
   document.getElementById("stat-calories-hint").textContent = `of ${target} kcal target`;
 
-  updateStreak(log);
+  updateStreak();
 }
 
 /* ---------- Progress log ---------- */
@@ -561,6 +606,7 @@ function initSettings() {
     localStorage.removeItem(STORAGE_KEYS.health);
     localStorage.removeItem(STORAGE_KEYS.todayPlan);
     localStorage.removeItem(STORAGE_KEYS.mealLog);
+    localStorage.removeItem(STORAGE_KEYS.quickLog);
     document.getElementById("health-results").hidden = true;
     document.getElementById("health-status").textContent = "";
     renderDashboardStats();
@@ -568,6 +614,7 @@ function initSettings() {
     renderTodayPlan();
     renderMealLog();
     renderCalorieSummary();
+    renderQuickLog();
   });
 }
 
@@ -578,6 +625,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initRestTimer();
   initWorkoutsView();
   initMealsView();
+  initQuickLog();
   initHealthImport();
   initSettings();
   renderTodayPlan();
